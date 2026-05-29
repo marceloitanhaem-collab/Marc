@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+import json
+import re
+from datetime import datetime
+
+class OraculoDaMateriaCompleto:
+    def __init__(self):
+        self.contador_requisicoes = 0
+        self.LIMITE_DIARIO = 10000
+        
+        # Matriz Termodinâmica Base
+        self.MATRIZ_CIENTIFICA = {
+            "ferro": {"energia": 6.2, "agua": 42},
+            "cobre": {"energia": 45.0, "agua": 125},
+            "silicio": {"energia": 160.0, "agua": 2100}
+        }
+        
+        # Banco Semente de Produtos com Metadados Temporais, Pop e Corporativos
+        self.banco_produtos = {
+            "memoria_ddr5": {
+                "nome": "Módulo de Memória RAM DDR5 16GB",
+                "preco_base_usd": 85.00,
+                "ano_referencia": 2026,
+                "composicao_kg": {"silicio": 0.15, "cobre": 0.05, "ferro": 0.02},
+                "cultura_pop": "Evolução direta das memórias DIMM dos anos 90. Conceitos de matriz de dados similares operam as telas verdes em Matrix (1999).",
+                "glorificacao_marca": {
+                    "empresa": "IBM",
+                    "fato_historico": "Pioneira na introdução de memórias magnéticas na década de 1950.",
+                    "status_comercial": "Gratuito", 
+                    "url": "https://www.ibm.com/br-pt/history"
+                },
+                "premium_tecnico": {
+                    "normas": ["ISO 9001", "IEC 60747", "JEDEC JESD79-5B"],
+                    "interop_medica": "Homologada para placas de reconstrução em Tomografias de alta precisão."
+                },
+                "rastros_seguranca": ["lote_regular_verificado"]
+            }
+        }
+        
+        # Lista Negra de Segurança Ativa (Simulação de Órgãos Públicos)
+        self.lista_negra_seguranca = ["lote_eletronico_roubado_2026", "fornecedor_trabalho_ilegal"]
+
+    def processar_busca_mestre(self, termo_busca, tipo_entrada="texto", status_usuario="Gratuito", pais_usuario="BR"):
+        self.contador_requisicoes += 1
+        if self.contador_requisicoes > self.LIMITE_DIARIO:
+            return {"erro": "Limite de tráfego de segurança atingido."}
+            
+        # Normalização de strings contra injeção de scripts
+        termo_chave = re.sub(r'[^a-zA-Z0-9_\\s]', '', termo_busca).strip().lower().replace(' ', '_')
+        
+        produto = self.banco_produtos.get(termo_chave)
+        if not produto:
+            return {"status": 404, "mensagem": "Item adicionado à fila de mineração do lote de 100."}
+            
+        # Auditoria de Segurança Ativa e Compliance
+        for rastro in produto["rastros_seguranca"]:
+            if rastro in self.lista_negra_seguranca:
+                return self._disparar_alerta_orgaos(produto["nome"], rastro)
+                
+        # Cálculos Econômicos e Ambientais Amostrais
+        e_total = sum(peso * self.MATRIZ_CIENTIFICA[mat]["energia"] for mat, peso in produto["composicao_kg"].items())
+        a_total = sum(peso * self.MATRIZ_CIENTIFICA[mat]["agua"] for mat, peso in produto["composicao_kg"].items())
+        
+        # Localização Automática de Moeda e Câmbio
+        fator_cambio = 5.20 if pais_usuario == "BR" else 1.0
+        simbolo_moeda = "R$" if pais_usuario == "BR" else "US$"
+        valor_convertido = produto["preco_base_usd"] * fator_cambio
+        
+        # Construção da resposta híbrida baseada no plano (Freemium)
+        dossie = {
+            "dados_publicos": {
+                "produto": produto["nome"],
+                "preco_local_ajustado": f"{simbolo_moeda} {valor_convertido:,.2f}",
+                "sustentabilidade": {"energia_kwh": round(e_total, 2), "agua_litros": round(a_total, 2)},
+                "cultura_pop_cinema": produto["cultura_pop"],
+                "glorificacao_patrocinio": {
+                    "marca": produto["glorificacao_marca"]["empresa"],
+                    "fato": produto["glorificacao_marca"]["fato_historico"],
+                    "link": produto["glorificacao_marca"]["url"]
+                }
+            }
+        }
+        
+        if status_usuario == "Gratuito":
+            dossie["trava_premium_profissional"] = {
+                "status": "BLOQUEADO (🔒 BLUR VISUAL)",
+                "mensagem": "Identificadas 3 normas técnicas (ISO/IEC) e dados de interoperabilidade médica. Assine para acessar."
+            }
+        else:
+            dossie["camada_premium_desbloqueada"] = produto["premium_tecnico"]
+            
+        return dossie
+
+    def _disparar_alerta_orgaos(self, nome_prod, rastro_crime):
+        return {
+            "STATUS": "PRODUTO BLOQUEADO - ILÍCITO IDENTIFICADO",
+            "ALERTA_ENVIADO": f"Comunicação eletrônica automática enviada para Polícia Civil, Receita Federal e Interpol.",
+            "registro": {"objeto": nome_prod, "evidencia": rastro_crime, "timestamp": datetime.now().isoformat()}
+        }
