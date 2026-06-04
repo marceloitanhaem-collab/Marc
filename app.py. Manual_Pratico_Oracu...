@@ -4,25 +4,33 @@ import os
 
 app = Flask(__name__)
 
-# Configure a chave do Gemini (o ideal é usar variáveis de ambiente)
+# Configuração da chave - em produção, usaremos uma variável de ambiente
 genai.configure(api_key="SUA_CHAVE_GEMINI_AQUI")
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 @app.route('/oraculo-api', methods=['POST'])
 def oraculo_api():
-    dados = request.json
-    url_imagem = dados.get('imageUrl')
-    
-    # Instrução para a IA
-    prompt = "Analise esta imagem, identifique o nome do produto, uma breve descrição e o preço. Responda apenas em formato JSON com as chaves: 'nome', 'descricao', 'preco'."
-    
-    # Processamento com Gemini (simplificado para o exemplo)
     try:
-        # Aqui o Gemini processa a URL da imagem
+        dados = request.json
+        url_imagem = dados.get('imageUrl')
+        
+        if not url_imagem:
+            return jsonify({"status": "erro", "mensagem": "Nenhuma imagem foi recebida"}), 400
+        
+        # O prompt estruturado para garantir que a IA devolva o que precisamos
+        prompt = (
+            "Analise a imagem e extraia os dados em formato JSON. "
+            "Use estas chaves: 'nome_produto', 'descricao', 'preco'. "
+            "Se não encontrar o preço, coloque '0.00'."
+        )
+        
         response = model.generate_content([prompt, url_imagem])
+        
+        # Aqui o resultado vai chegar organizado
         return jsonify({"status": "sucesso", "dados": response.text})
+        
     except Exception as e:
-        return jsonify({"status": "erro", "mensagem": str(e)})
+        return jsonify({"status": "erro", "mensagem": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    app.run(debug=True)
