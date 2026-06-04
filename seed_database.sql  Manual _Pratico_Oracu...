@@ -1,29 +1,7 @@
--- Script SQL para criação da tabela semente do lote de 100 produtos
-CREATE TABLE produtos_oraculo (
+-- Estrutura do seu banco de dados
+CREATE TABLE IF NOT EXISTS produtos (
     id SERIAL PRIMARY KEY,
-    chave_busca VARCHAR(100) UNIQUE NOT NULL,
-    nome VARCHAR(255) NOT NULL,
-    preco_base_usd NUMERIC(10, 2) NOT NULL,
-    ano_referencia INT NOT NULL,
-    composicao_silicio_kg NUMERIC(6, 4) DEFAULT 0,
-    composicao_cobre_kg NUMERIC(6, 4) DEFAULT 0,
-    composicao_ferro_kg NUMERIC(6, 4) DEFAULT 0,
-    cultura_pop TEXT,
-    empresa_patrocinio VARCHAR(100),
-    fato_historico TEXT,
-    url_patrocinio TEXT,
-    normas_tecnicas TEXT[],
-    interop_medica TEXT,
-    rastro_seguranca VARCHAR(100) DEFAULT 'lote_regular_verificado'
-);
-
-INSERT INTO produtos_oraculo (
-    chave_busca, nome, preco_base_usd, ano_referencia, 
-    composicao_silicio_kg, composicao_cobre_kg, composicao_ferro_kg, cultura_pop,
-    empresa_patrocinio, fato_historico, url_patrocinio, normas_tecnicas, interop_medica
-) VALUES (
-    'memoria_ddr5', 'Módulo de Memória RAM DDR5 16GB', 85.00, 2026, 
-    0.1500, 0.0500, 0.0200, 'Evolução direta das memórias DIMM dos anos 90.',
-    'IBM', 'Pioneira na introdução de memórias magnéticas na década de 1950.', 'https://www.ibm.com/br-pt/history',
-    ARRAY['ISO 9001', 'IEC 60747'], 'Homologada para placas de reconstrução em Tomografias.'
+    nome TEXT,
+    descricao TEXT,
+    preco DECIMAL
 );
