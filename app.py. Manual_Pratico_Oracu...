@@ -1,5 +1,25 @@
-# Este é o seu servidor de inteligência
-print("Oráculo da Matéria - Sistema Iniciado")
+# app.py - Motor de Extração
+from flask import Flask, request, jsonify
+import google.generativeai as genai
 
-# Aqui ficaria a sua lógica de conexão com o Gemini e Banco de Dados
-# Quando você estiver pronto para configurar o servidor, colaremos a lógica real aqui.
+app = Flask(__name__)
+
+# Configure sua chave de API do Gemini aqui
+genai.configure(api_key="SUA_CHAVE_AQUI")
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+@app.route('/oraculo-api', methods=['POST'])
+def processar_imagem():
+    data = request.json
+    image_base64 = data.get('imageBase64')
+    
+    # Pergunta para a IA extrair os dados estruturados
+    prompt = "Extraia as informações desta imagem e retorne em formato de tabela (JSON): nome do produto, descrição e preço."
+    
+    # Aqui a IA processa a imagem
+    response = model.generate_content([prompt, image_base64])
+    
+    return jsonify({"resultado": response.text})
+
+if __name__ == '__main__':
+    app.run(debug=True)
