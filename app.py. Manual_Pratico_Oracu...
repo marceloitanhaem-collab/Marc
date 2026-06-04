@@ -1,14 +1,14 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # <-- Importamos isso aqui
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# Carrega as variáveis do arquivo .env
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)  # <-- Isso libera a conexão com a extensão
 
-# Pega a chave direto do arquivo .env de forma segura
 api_key = os.getenv("GEMINI_API_KEY")
 genai.configure(api_key=api_key)
 model = genai.GenerativeModel('gemini-1.5-flash')
@@ -22,14 +22,12 @@ def oraculo_api():
         if not url_imagem:
             return jsonify({"status": "erro", "mensagem": "Sem imagem"}), 400
         
-        prompt = "Analise a imagem e extraia: nome do produto, descrição e preço. Responda em JSON."
-        
+        prompt = "Analise a imagem e extraia: nome do produto, descrição e preço. Responda apenas em JSON."
         response = model.generate_content([prompt, url_imagem])
         
         return jsonify({"status": "sucesso", "dados": response.text})
-        
     except Exception as e:
         return jsonify({"status": "erro", "mensagem": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
